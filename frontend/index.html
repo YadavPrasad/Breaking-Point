@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Device Failure Prediction Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fafafa;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Main Layout */
+        .main-content {
+            padding: 32px 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            padding: 24px 24px 0;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .card-content {
+            padding: 0 24px 24px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Results Styles */
+        .results-container {
+            text-align: center;
+        }
+
+        .prediction-result {
+            margin-bottom: 32px;
+        }
+
+        .prediction-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .prediction-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .prediction-yes {
+            color: #dc2626;
+        }
+
+        .prediction-no {
+            color: #16a34a;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            margin-bottom: 32px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .progress-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .progress-bar-container {
+            background: #f1f5f9;
+            border-radius: 6px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-low {
+            background: #16a34a;
+        }
+
+        .progress-medium {
+            background: #f59e0b;
+        }
+
+        .progress-high {
+            background: #dc2626;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Risk Badge */
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .risk-low {
+            background: #16a34a;
+        }
+
+        .risk-medium {
+            background: #f59e0b;
+        }
+
+        .risk-high {
+            background: #dc2626;
+        }
+
+        /* Assessment Box */
+        .assessment-box {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: left;
+        }
+
+        .assessment-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .assessment-text {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 48px 0;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f1f5f9;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            padding: 48px 0;
+            color: #64748b;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>Medical Device Failure Prediction Dashboard</h1>
+            <p>AI-powered recall risk assessment system</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- Input Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Device Information</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="predictionForm">
+                            <div class="form-group">
+                                <label class="form-label" for="country">Country Event</label>
+                                <input 
+                                    type="text" 
+                                    id="country" 
+                                    class="form-input"
+                                    placeholder="e.g., USA, India, Germany"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="cause">Determined Cause</label>
+                                <input 
+                                    type="text" 
+                                    id="cause" 
+                                    class="form-input"
+                                    placeholder="e.g., Design Issue, Manufacturing Defect, Unknown"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="status">Status</label>
+                                <input 
+                                    type="text" 
+                                    id="status" 
+                                    class="form-input"
+                                    placeholder="e.g., Ongoing, Terminated, Closed"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="riskClass">Risk Class</label>
+                                <input 
+                                    type="text" 
+                                    id="riskClass" 
+                                    class="form-input"
+                                    placeholder="e.g., High, Medium, Low, Unknown"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="reason">Reason</label>
+                                <textarea 
+                                    id="reason" 
+                                    class="form-input form-textarea"
+                                    placeholder="Describe the issue in detail..."
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-primary" id="predictBtn">
+                                Predict Recall Risk
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Prediction Results</h2>
+                    </div>
+                    <div class="card-content">
+                        <!-- Empty State -->
+                        <div id="emptyState" class="empty-state">
+                            Enter device information and click "Predict Recall Risk" to see results.
+                        </div>
+
+                        <!-- Loading State -->
+                        <div id="loadingState" class="loading hidden">
+                            <div class="spinner"></div>
+                        </div>
+
+                        <!-- Results -->
+                        <div id="resultsContainer" class="results-container hidden">
+                            <!-- Prediction Result -->
+                            <div class="prediction-result">
+                                <div class="prediction-label">Prediction</div>
+                                <div id="predictionValue" class="prediction-value">
+                                    Recall: No
+                                </div>
+                            </div>
+
+                            <!-- Risk Probability -->
+                            <div class="progress-section">
+                                <div class="progress-header">
+                                    <span class="progress-label">Risk Probability</span>
+                                    <span id="probabilityValue" class="progress-value">25%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div id="progressBar" class="progress-bar progress-low" style="width: 25%"></div>
+                                </div>
+                                <div class="progress-labels">
+                                    <span>0%</span>
+                                    <span>50%</span>
+                                    <span>100%</span>
+                                </div>
+                            </div>
+
+                            <!-- Risk Level Badge -->
+                            <div id="riskBadge" class="risk-badge risk-low">
+                                Low Risk
+                            </div>
+
+                            <!-- Risk Assessment -->
+                            <div class="assessment-box">
+                                <h4 class="assessment-title">Risk Assessment</h4>
+                                <p id="assessmentText" class="assessment-text">
+                                    The analysis indicates a low probability of recall. Device appears to meet safety standards.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('predictionForm');
+        const predictBtn = document.getElementById('predictBtn');
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const predictionValue = document.getElementById('predictionValue');
+        const probabilityValue = document.getElementById('probabilityValue');
+        const progressBar = document.getElementById('progressBar');
+        const riskBadge = document.getElementById('riskBadge');
+        const assessmentText = document.getElementById('assessmentText');
+
+        // Form inputs
+        const countryInput = document.getElementById('country');
+        const causeInput = document.getElementById('cause');
+        const statusInput = document.getElementById('status');
+        const riskClassInput = document.getElementById('riskClass');
+        const reasonInput = document.getElementById('reason');
+
+        // Utility functions
+        function getRiskLevel(probability) {
+            if (probability < 30) return 'low';
+            if (probability <= 60) return 'medium';
+            return 'high';
+        }
+
+        function getRiskText(probability) {
+            if (probability < 30) return 'Low Risk';
+            if (probability <= 60) return 'Medium Risk';
+            return 'High Risk';
+        }
+
+        function getAssessmentText(probability) {
+            if (probability < 30) {
+                return 'The analysis indicates a low probability of recall. Device appears to meet safety standards.';
+            } else if (probability <= 60) {
+                return 'The analysis shows moderate risk factors. Consider additional monitoring and quality checks.';
+            } else {
+                return 'High risk indicators detected. Immediate review and potential recall consideration recommended.';
+            }
+        }
+
+        function updateResults(prediction, probability) {
+            // Update prediction
+            predictionValue.textContent = `Recall: ${prediction}`;
+            predictionValue.className = `prediction-value prediction-${prediction.toLowerCase()}`;
+
+            // Update probability
+            probabilityValue.textContent = `${probability}%`;
+            probabilityValue.className = `progress-value progress-${getRiskLevel(probability)}`;
+
+            // Update progress bar
+            progressBar.style.width = `${probability}%`;
+            progressBar.className = `progress-bar progress-${getRiskLevel(probability)}`;
+
+            // Update risk badge
+            const riskLevel = getRiskLevel(probability);
+            riskBadge.textContent = getRiskText(probability);
+            riskBadge.className = `risk-badge risk-${riskLevel}`;
+
+            // Update assessment text
+            assessmentText.textContent = getAssessmentText(probability);
+        }
+
+        function showState(state) {
+            emptyState.classList.add('hidden');
+            loadingState.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+
+            switch (state) {
+                case 'empty':
+                    emptyState.classList.remove('hidden');
+                    break;
+                case 'loading':
+                    loadingState.classList.remove('hidden');
+                    break;
+                case 'results':
+                    resultsContainer.classList.remove('hidden');
+                    break;
+            }
+        }
+
+	// Real prediction function - calls Flask API
+	async function predictRecallRisk(formData) {
+	    const response = await fetch('/predict', {
+		method: 'POST',
+		headers: {
+		    'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+		    country_event: formData.country,
+		    determined_cause: formData.cause,
+		    status: formData.status,
+		    risk_class: formData.riskClass,
+		    reason: formData.reason
+		}),
+	    });
+
+	    if (!response.ok) {
+		throw new Error('Prediction API failed');
+	    }
+
+	    const result = await response.json();
+	    return {
+		prediction: result.prediction === 1 ? 'Yes' : 'No',
+		probability: Math.round(result.probability * 100)
+	    };
+	}
+
+
+        // Form submission handler
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form data
+            const formData = {
+                country: countryInput.value,
+                cause: causeInput.value,
+                status: statusInput.value,
+                riskClass: riskClassInput.value,
+                reason: reasonInput.value
+            };
+
+            // Show loading state
+            showState('loading');
+            predictBtn.disabled = true;
+            predictBtn.textContent = 'Analyzing...';
+
+            try {
+                // Get prediction
+                const result = await predictRecallRisk(formData);
+
+                // Update UI with results
+                updateResults(result.prediction, result.probability);
+                showState('results');
+            } catch (error) {
+                console.error('Prediction failed:', error);
+                showState('empty');
+            } finally {
+                // Reset button
+                predictBtn.disabled = false;
+                predictBtn.textContent = 'Predict Recall Risk';
+            }
+        });
+    </script>
+</body>
+</html>
