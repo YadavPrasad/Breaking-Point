@@ -1,46 +1,46 @@
-name: Deploy Cognizant App via SSH to EC2
+# name: Deploy Cognizant App via SSH to EC2
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-env:
-  DEPLOY_USER: 'ubuntu'
-  DEPLOY_HOST: '13.200.253.22'
+# env:
+#   DEPLOY_USER: 'ubuntu'
+#   DEPLOY_HOST: '13.200.253.22'
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          clean: true
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#           clean: true
 
-      - name: Setup SSH key
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
-          chmod 600 ec2_key.pem
+#       - name: Setup SSH key
+#         run: |
+#           echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
+#           chmod 600 ec2_key.pem
 
-      - name: SSH into EC2 and deploy
-        run: |
-          ssh -i ec2_key.pem -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST << 'EOF'
-            echo "✅ Pulling latest code..."
-            cd /home/ubuntu/cognizant-app
-            git fetch --all
-            git reset --hard origin/main
+#       - name: SSH into EC2 and deploy
+#         run: |
+#           ssh -i ec2_key.pem -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST << 'EOF'
+#             echo "✅ Pulling latest code..."
+#             cd /home/ubuntu/cognizant-app
+#             git fetch --all
+#             git reset --hard origin/main
 
-            echo "🧹 Cleaning old containers and images..."
-            docker rm -f cognizant-app || true
-            docker rmi -f cognizant-app:latest || true
+#             echo "🧹 Cleaning old containers and images..."
+#             docker rm -f cognizant-app || true
+#             docker rmi -f cognizant-app:latest || true
 
-            echo "🐳 Building Docker image..."
-            docker build -t cognizant-app:latest .
+#             echo "🐳 Building Docker image..."
+#             docker build -t cognizant-app:latest .
 
-            echo "🚀 Running new container..."
-            docker run -d -p 8000:8000 --name cognizant-app \
-              cognizant-app:latest
-          EOF
+#             echo "🚀 Running new container..."
+#             docker run -d -p 8000:8000 --name cognizant-app \
+#               cognizant-app:latest
+#           EOF
