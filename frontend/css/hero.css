@@ -1,0 +1,90 @@
+.hero {
+  background: var(--gradient-hero);
+  padding: 3rem 0;
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.hero-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.hero-feature {
+  background: var(--card);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hero-feature-icon {
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+.hero-feature h3 {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.hero-feature p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.hero-image {
+  text-align: center;
+}
+
+.hero-image-placeholder {
+  width: 300px;
+  height: 200px;
+  background: var(--gradient-primary);
+  border-radius: 1rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 4rem;
+}
+
+.hero-image-box {
+  width: 500px;
+  height: 350px;
+  background-image: url("https://images.stockcake.com/public/7/9/5/7959bdaa-a0e2-43e3-8503-414a90ef413b_large/modern-medical-equipment-stockcake.jpg");
+  background-size: cover;       
+  background-position: center;  
+  border-radius: 1rem;          
+  margin: 0 auto;               
+  display: flex;                
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-feature-icon {
+  width: 40px;
+  height: 36px;
+}
