@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ARTIFACT_DIR = os.path.join(BASE_DIR, "artifacts_model")  
-FRONTEND_DIR = os.path.join(BASE_DIR,"..","frontend")
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 
 def try_load(path):
